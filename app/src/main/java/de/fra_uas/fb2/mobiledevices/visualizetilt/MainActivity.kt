@@ -6,49 +6,46 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ProgressBar
-import android.widget.TextView
-import kotlin.math.abs
-import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity(), SensorEventListener{
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
-    private lateinit var xValue: TextView
-    private lateinit var yValue: TextView
-    private lateinit var xBar: ProgressBar
-    private lateinit var yBar: ProgressBar
+    private var magnetometer: Sensor? = null
+    private var gyroscope: Sensor? = null
+    private var gameRotationVectorSensor: Sensor? = null
+    private lateinit var customView: TiltView
+
+    private var startAngle = 0f // 회전 시작 각도
+    private var currentAngle = 0f // 현재 회전 각도
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // TextView 및 ProgressBar 초기화
-        xValue = findViewById(R.id.x_value)
-        yValue = findViewById(R.id.y_value)
-        xBar = findViewById(R.id.x_bar)
-        yBar = findViewById(R.id.y_bar)
-
-        // ProgressBar의 최대값 설정
-        xBar.max = 40  // -20 to 20 m/s² (scaled to 0 to 40)
-        yBar.max = 20
+        customView = findViewById(R.id.customView)
 
         // SensorManager 초기화
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        gameRotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
 
-        // 가속도 센서가 없는 경우 예외 처리
-        if (accelerometer == null) {
-            xValue.text = "Accelerometer not available"
-            yValue.text = "Accelerometer not available"
-        }
     }
 
     override fun onResume() {
         super.onResume()
         accelerometer?.also { accel ->
             sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+        magnetometer?.also { mag ->
+            sensorManager.registerListener(this, mag, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+        gyroscope?.also { gyro ->
+            sensorManager.registerListener(this, gyro, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+        gameRotationVectorSensor?.also { sensor ->
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
 
@@ -58,16 +55,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER && event.values[2] >= 0) {
-            val x = event.values[0]
-            val y = event.values[1]
+        when(event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER -> {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+                customView.updateOffsets(x, y, z)
+            }
+            Sensor.TYPE_GYROSCOPE -> {
+                val rotationSpeed = event.values[2] // z-rotation rate (radians/second)
+                val deltaTime = 0.005 // 예시에서는 간격을 0.02초로 설정
 
-            xValue.text = "X: ${abs(x.roundToInt())} m/s²"
-            yValue.text = "Y: ${abs(y.roundToInt())} m/s²"
+                // 회전 각도 계산
+                val deltaAngle = rotationSpeed * deltaTime // 회전 속도 * 시간 간격
 
-            // ProgressBar를 기울기에 따라 업데이트
-            xBar.progress = (x + 20).roundToInt()  // -20 to 20 scaled to 0 to 40
-            yBar.progress = (y + 10).roundToInt()  // -20 to 20 scaled to 0 to 40
+                // 현재 각도 업데이트
+                currentAngle += Math.toDegrees(deltaAngle).toFloat()
+
+                val rotationFromInitial = currentAngle - startAngle
+                customView.updateStrokeWidth(rotationFromInitial)
+                println(rotationFromInitial)
+            }
         }
     }
 
