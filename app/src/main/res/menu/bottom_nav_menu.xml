@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/menu/bottom_nav_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_tilt"
+        android:icon="@drawable/ic_tilt"
+        android:title="@string/tilt" />
+    <item
+        android:id="@+id/navigation_graph"
+        android:icon="@drawable/ic_graph"
+        android:title="@string/graph" />
+
+</menu>

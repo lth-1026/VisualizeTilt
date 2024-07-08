@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 커스텀 스타일 정의 -->
+    <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemTextAppearanceActive">@style/CustomBottomNavigationTextAppearance</item>
+        <item name="itemTextAppearanceInactive">@style/CustomBottomNavigationTextAppearance</item>
+    </style>
+
+    <style name="CustomBottomNavigationTextAppearance" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">16sp</item> <!-- 원하는 글씨 크기 설정 -->
+    </style>
+</resources>
