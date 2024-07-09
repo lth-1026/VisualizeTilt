@@ -139,9 +139,6 @@ class TiltFragment : Fragment(), SensorEventListener {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun saveDataToDatabase(x: Float, y: Float, z: Float, bitmap: Bitmap) {
-        // 데이터베이스 저장 로직 구현
-        // 예시: Room 또는 SQLite를 사용하여 데이터베이스에 저장
-
         // 데이터베이스 엔티티 생성
         val data = MyDataEntity(
             x = x,
@@ -162,5 +159,4 @@ class TiltFragment : Fragment(), SensorEventListener {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         return stream.toByteArray()
     }
-
 }
