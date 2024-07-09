@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -45,6 +47,8 @@ class TiltFragment : Fragment(), SensorEventListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Toast.makeText(context,"If you touch the View, Picture will be saved", Toast.LENGTH_SHORT).show()
 
         customView = view.findViewById(R.id.customView)
 
@@ -130,8 +134,10 @@ class TiltFragment : Fragment(), SensorEventListener {
 
         // 데이터베이스에 저장 (x, y, z 값 및 이미지)
         saveDataToDatabase(latestX, latestY, latestZ, bitmap)
+        Toast.makeText(context, "saved successfully", Toast.LENGTH_SHORT).show()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun saveDataToDatabase(x: Float, y: Float, z: Float, bitmap: Bitmap) {
         // 데이터베이스 저장 로직 구현
         // 예시: Room 또는 SQLite를 사용하여 데이터베이스에 저장
