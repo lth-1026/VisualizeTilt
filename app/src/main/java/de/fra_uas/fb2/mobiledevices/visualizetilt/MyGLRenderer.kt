@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGLRenderer : GLSurfaceView.Renderer {
+class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     private val mMVPMatrix = FloatArray(16)
     private val mProjectionMatrix = FloatArray(16)
@@ -21,15 +21,26 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     private lateinit var mAxis: Axis
     private lateinit var mSpheres: ArrayList<Sphere>
 
+    private lateinit var myDataDao: MyDataDao // Room DAO
+    // Room 데이터베이스 인스턴스
+    private lateinit var database: MyDatabase
+
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f) // 배경을 흰색으로 설정
         GLES20.glEnable(GLES20.GL_DEPTH_TEST) // 깊이 테스트 활성화
         mAxis = Axis()
         // 여러 개의 구를 생성하여 리스트에 추가
         mSpheres = ArrayList()
-        mSpheres.add(Sphere(0.0f, 0.5f, -0.3f, 0.02f))
-        mSpheres.add(Sphere(-0.0f, -0.0f, -0.0f, 0.02f))
-//        mSphere = Sphere(0f, 0f, 0f, 0.0001f)
+
+        // Room 데이터베이스 초기화
+        database = (context.applicationContext as MyApplication).database
+        myDataDao = database.myDataDao()
+
+        val pointsFromDatabase = myDataDao.getAll()
+
+        for(point in pointsFromDatabase){
+            mSpheres.add(Sphere(point.id, point.x *0.1f, point.y*0.1f, point.z*0.1f, 0.02f, point.image))
+        }
     }
 
     override fun onDrawFrame(gl: GL10?) {
@@ -110,6 +121,7 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         for (sphere in mSpheres) {
             if (sphere.isTouched(rayOrigin, rayDir)) {
                 // Sphere is touched, show popup
+                val touchedSphere = sphere
                 (context as Activity).runOnUiThread {
                     showPopup("Sphere touched!", context)
                 }

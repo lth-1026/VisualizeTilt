@@ -7,7 +7,7 @@ import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Sphere(val centerX: Float, val centerY: Float, val centerZ: Float, val radius: Float) {
+class Sphere(val id: Int, val centerX: Float, val centerY: Float, val centerZ: Float, val radius: Float, val image: ByteArray) {
 
     private val vertexShaderCode = """
         uniform mat4 uMVPMatrix;
