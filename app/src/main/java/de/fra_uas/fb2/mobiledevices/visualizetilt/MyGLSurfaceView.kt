@@ -31,8 +31,9 @@ class MyGLSurfaceView(context: Context, attrs: AttributeSet) : GLSurfaceView(con
                 val dy = y - previousY
 
                 // 반응성을 높이기 위해 x 및 y 좌표의 변경 값을 적용합니다.
-                renderer.angleX += dx * 0.3f
-                renderer.angleY += dy * 0.3f
+                //또한 x,y축의 움직임을 바꿔줌
+                renderer.angleY += dx * 0.3f
+                renderer.angleX += dy * 0.3f
 
                 requestRender()
             }
