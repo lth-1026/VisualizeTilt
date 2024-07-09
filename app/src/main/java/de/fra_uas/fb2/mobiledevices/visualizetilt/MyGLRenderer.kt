@@ -155,7 +155,7 @@ class MyGLRenderer(private val context: Context, private val myGLSurfaceView: My
         val negativeButton: Button = dialogView.findViewById(R.id.negativeButton)
 
         // Customize views
-        dialogMessage.text = "x: ${String.format("%.2f", touchedSphere.centerX * 10)}, " +
+        dialogMessage.text = "Accelerometer (m/s2)\nx: ${String.format("%.2f", touchedSphere.centerX * 10)}, " +
                 "y: ${String.format("%.2f", touchedSphere.centerY * 10)}, " +
                 "z: ${String.format("%.2f", touchedSphere.centerZ * 10)}"
 
