@@ -105,6 +105,18 @@ class Sphere(val centerX: Float, val centerY: Float, val centerZ: Float, val rad
         GLES20.glDisableVertexAttribArray(positionHandle)
     }
 
+    fun isTouched(rayOrigin: Vec3, rayDir: Vec3): Boolean {
+        val sphereCenter = Vec3(centerX, centerY, centerZ)
+        val oc = rayOrigin - sphereCenter
+
+        val a = rayDir.dot(rayDir)
+        val b = 2.0f * oc.dot(rayDir)
+        val c = oc.dot(oc) - radius * radius
+
+        val discriminant = b * b - 4 * a * c
+        return discriminant > 0
+    }
+
     companion object {
         private const val COORDS_PER_VERTEX = 3
         private const val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex

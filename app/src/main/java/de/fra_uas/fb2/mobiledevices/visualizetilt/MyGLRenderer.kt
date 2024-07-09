@@ -1,8 +1,11 @@
 package de.fra_uas.fb2.mobiledevices.visualizetilt
 
+import android.app.Activity
+import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import androidx.appcompat.app.AlertDialog
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -16,7 +19,6 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     var angleY = 0f
 
     private lateinit var mAxis: Axis
-//    private lateinit var mSphere: Sphere
     private lateinit var mSpheres: ArrayList<Sphere>
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -77,6 +79,50 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height)
         val ratio: Float = width.toFloat() / height.toFloat()
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+    }
+
+    fun handleTouch(normalizedX: Float, normalizedY: Float, context: Context) {
+        val invertedMVPMatrix = FloatArray(16)
+        Matrix.invertM(invertedMVPMatrix, 0, mMVPMatrix, 0)
+
+        val nearPoint = floatArrayOf(normalizedX, normalizedY, -1.0f, 1.0f)
+        val farPoint = floatArrayOf(normalizedX, normalizedY, 1.0f, 1.0f)
+
+        val nearPointWorld = FloatArray(4)
+        val farPointWorld = FloatArray(4)
+
+        Matrix.multiplyMV(nearPointWorld, 0, invertedMVPMatrix, 0, nearPoint, 0)
+        Matrix.multiplyMV(farPointWorld, 0, invertedMVPMatrix, 0, farPoint, 0)
+
+        // Normalize world coordinates
+        nearPointWorld[0] /= nearPointWorld[3]
+        nearPointWorld[1] /= nearPointWorld[3]
+        nearPointWorld[2] /= nearPointWorld[3]
+
+        farPointWorld[0] /= farPointWorld[3]
+        farPointWorld[1] /= farPointWorld[3]
+        farPointWorld[2] /= farPointWorld[3]
+
+        val rayOrigin = Vec3(nearPointWorld[0], nearPointWorld[1], nearPointWorld[2])
+        val rayEnd = Vec3(farPointWorld[0], farPointWorld[1], farPointWorld[2])
+        val rayDir = rayEnd - rayOrigin
+
+        for (sphere in mSpheres) {
+            if (sphere.isTouched(rayOrigin, rayDir)) {
+                // Sphere is touched, show popup
+                (context as Activity).runOnUiThread {
+                    showPopup("Sphere touched!", context)
+                }
+            }
+        }
+    }
+
+    private fun showPopup(message: String, context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle("Popup")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     companion object {

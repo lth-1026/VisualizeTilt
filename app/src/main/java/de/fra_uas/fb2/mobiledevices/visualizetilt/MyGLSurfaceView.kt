@@ -1,5 +1,6 @@
 package de.fra_uas.fb2.mobiledevices.visualizetilt
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
@@ -19,6 +20,7 @@ class MyGLSurfaceView(context: Context, attrs: AttributeSet) : GLSurfaceView(con
     private var previousX = 0f
     private var previousY = 0f
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
@@ -33,6 +35,13 @@ class MyGLSurfaceView(context: Context, attrs: AttributeSet) : GLSurfaceView(con
                 renderer.angleY += dy * 0.3f
 
                 requestRender()
+            }
+            MotionEvent.ACTION_DOWN -> {
+                val normalizedX = (event.x / width) * 2 - 1
+                val normalizedY = -((event.y / height) * 2 - 1)
+                queueEvent {
+                    renderer.handleTouch(normalizedX, normalizedY, context)
+                }
             }
         }
 
