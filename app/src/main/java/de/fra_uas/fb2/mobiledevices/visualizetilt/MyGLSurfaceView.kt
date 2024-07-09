@@ -12,7 +12,7 @@ class MyGLSurfaceView(context: Context, attrs: AttributeSet) : GLSurfaceView(con
 
     init {
         setEGLContextClientVersion(2) // OpenGL ES 2.0 context 설정
-        renderer = MyGLRenderer(context)
+        renderer = MyGLRenderer(context, this)
         setRenderer(renderer)
         renderMode = RENDERMODE_WHEN_DIRTY // 터치 이벤트가 발생할 때만 렌더링
     }

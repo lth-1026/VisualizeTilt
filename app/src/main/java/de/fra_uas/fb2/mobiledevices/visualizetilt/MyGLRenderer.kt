@@ -1,15 +1,26 @@
 package de.fra_uas.fb2.mobiledevices.visualizetilt
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
+class MyGLRenderer(private val context: Context, private val myGLSurfaceView: MyGLSurfaceView) : GLSurfaceView.Renderer {
 
     private val mMVPMatrix = FloatArray(16)
     private val mProjectionMatrix = FloatArray(16)
@@ -21,9 +32,9 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private lateinit var mAxis: Axis
     private lateinit var mSpheres: ArrayList<Sphere>
 
-    private lateinit var myDataDao: MyDataDao // Room DAO
     // Room 데이터베이스 인스턴스
     private lateinit var database: MyDatabase
+    private lateinit var myDataDao: MyDataDao // Room DAO
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f) // 배경을 흰색으로 설정
@@ -121,20 +132,71 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         for (sphere in mSpheres) {
             if (sphere.isTouched(rayOrigin, rayDir)) {
                 // Sphere is touched, show popup
-                val touchedSphere = sphere
                 (context as Activity).runOnUiThread {
-                    showPopup("Sphere touched!", context)
+                    showCustomDialog(sphere, context)
                 }
             }
         }
     }
 
-    private fun showPopup(message: String, context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle("Popup")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .show()
+    @SuppressLint("SetTextI18n")
+    private fun showCustomDialog(touchedSphere: Sphere, context: Context) {
+        // Create a dialog builder
+        val builder = AlertDialog.Builder(context)
+        val inflater = LayoutInflater.from(context)
+        val dialogView = inflater.inflate(R.layout.custom_dialog_layout, null)
+
+        val bitmap = byteArrayToBitmap(touchedSphere.image)
+
+        // Find views in the custom layout
+        val dialogMessage: TextView = dialogView.findViewById(R.id.dialogMessage)
+        val dialogImage: ImageView = dialogView.findViewById(R.id.dialogImage)
+        val positiveButton: Button = dialogView.findViewById(R.id.positiveButton)
+        val negativeButton: Button = dialogView.findViewById(R.id.negativeButton)
+
+        // Customize views
+        dialogMessage.text = "x: ${String.format("%.2f", touchedSphere.centerX * 10)}, " +
+                "y: ${String.format("%.2f", touchedSphere.centerY * 10)}, " +
+                "z: ${String.format("%.2f", touchedSphere.centerZ * 10)}"
+
+        dialogImage.setImageBitmap(bitmap)
+
+        // Set the custom view to the dialog builder
+        builder.setView(dialogView)
+
+        // Create and show the dialog
+        val dialog = builder.create()
+        dialog.show()
+
+        // Set click listeners for buttons
+        positiveButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        negativeButton.setOnClickListener {
+            deleteSphereFromDatabaseAndGraph(touchedSphere)
+            Toast.makeText(context, "delete successfully", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun deleteSphereFromDatabaseAndGraph(sphereToDelete: Sphere) {
+        // 1. Delete from the database (implement as per your database logic)
+        GlobalScope.launch {
+            database.myDataDao().delete(sphereToDelete.id)
+        }
+
+        // 2. Remove from the list of spheres in MyGLRenderer
+        mSpheres.remove(sphereToDelete)
+
+        // 3. Request a render to update the OpenGL surface
+        myGLSurfaceView.requestRender()
+    }
+
+    // 바이트 배열을 비트맵으로 변환하는 함수
+    private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
 
     companion object {

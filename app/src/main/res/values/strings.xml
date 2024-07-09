@@ -2,4 +2,7 @@
     <string name="app_name">Visualize Tilt</string>
     <string name="tilt">Tilt</string>
     <string name="graph">Graph</string>
+    <string name="delete">DELETE</string>
+    <string name="ok">OK</string>
+    <string name="x_y_z">x: , y: , z:</string>
 </resources>
