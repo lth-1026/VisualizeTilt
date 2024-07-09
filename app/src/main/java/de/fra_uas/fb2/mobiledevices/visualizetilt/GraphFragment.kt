@@ -7,10 +7,22 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
 class GraphFragment : Fragment() {
+
+    private lateinit var glSurfaceView: MyGLSurfaceView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_graph, container, false)
+        val view = inflater.inflate(R.layout.fragment_graph, container, false)
+        glSurfaceView = view.findViewById(R.id.glSurfaceView)
+        return view
+    }
+    override fun onResume() {
+        super.onResume()
+        glSurfaceView.onResume()
+    }
+    override fun onPause() {
+        super.onPause()
+        glSurfaceView.onPause()
     }
 }

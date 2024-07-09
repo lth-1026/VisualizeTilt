@@ -83,7 +83,6 @@ class TiltFragment : Fragment(), SensorEventListener {
 
                 val rotationFromInitial = currentAngle - startAngle
                 customView.updateStrokeWidth(rotationFromInitial)
-                println(rotationFromInitial)
             }
         }
     }
