@@ -1,6 +1,8 @@
 package de.fra_uas.fb2.mobiledevices.visualizetilt
 
+import android.annotation.SuppressLint
 import android.content.Context.SENSOR_SERVICE
+import android.graphics.Bitmap
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -8,10 +10,16 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 class TiltFragment : Fragment(), SensorEventListener {
+
+    private lateinit var database: MyDatabase
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
@@ -23,6 +31,10 @@ class TiltFragment : Fragment(), SensorEventListener {
     private var startAngle = 0f // 회전 시작 각도
     private var currentAngle = 0f // 현재 회전 각도
 
+    private var latestX = 0f
+    private var latestY = 0f
+    private var latestZ = 0f
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +42,7 @@ class TiltFragment : Fragment(), SensorEventListener {
         return inflater.inflate(R.layout.fragment_tilt, container, false)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -40,6 +53,18 @@ class TiltFragment : Fragment(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
         gameRotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+
+        // 터치 리스너 추가
+        customView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // 터치 이벤트 발생 시 화면 캡처 및 데이터 저장
+                captureScreenAndSaveData()
+            }
+            true
+        }
+
+        // 데이터베이스 인스턴스 초기화
+        database = (requireActivity().application as MyApplication).database
     }
 
     override fun onResume() {
@@ -69,6 +94,9 @@ class TiltFragment : Fragment(), SensorEventListener {
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
+                latestX = x
+                latestY = y
+                latestZ = z
                 customView.updateOffsets(x, y, z)
             }
             Sensor.TYPE_GYROSCOPE -> {
@@ -90,4 +118,43 @@ class TiltFragment : Fragment(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // 필요시 구현
     }
+
+    private fun captureScreenAndSaveData() {
+        // View의 DrawingCache 활성화
+        customView.isDrawingCacheEnabled = true
+        customView.buildDrawingCache(true)
+
+        // 화면 캡처
+        val bitmap = Bitmap.createBitmap(customView.drawingCache)
+        customView.isDrawingCacheEnabled = false
+
+        // 데이터베이스에 저장 (x, y, z 값 및 이미지)
+        saveDataToDatabase(latestX, latestY, latestZ, bitmap)
+    }
+
+    private fun saveDataToDatabase(x: Float, y: Float, z: Float, bitmap: Bitmap) {
+        // 데이터베이스 저장 로직 구현
+        // 예시: Room 또는 SQLite를 사용하여 데이터베이스에 저장
+
+        // 데이터베이스 엔티티 생성
+        val data = MyDataEntity(
+            x = x,
+            y = y,
+            z = z,
+            image = bitmapToByteArray(bitmap) // Bitmap을 ByteArray로 변환
+        )
+
+        // 데이터베이스에 데이터 삽입
+        // 예시: Room 데이터베이스 사용 시
+        GlobalScope.launch {
+            database.myDataDao().insert(data)
+        }
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
+    }
+
 }
