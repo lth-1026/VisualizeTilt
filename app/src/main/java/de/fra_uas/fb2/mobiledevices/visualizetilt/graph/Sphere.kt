@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.graph
 
 import android.opengl.GLES20
 import java.nio.ByteBuffer

@@ -1,10 +1,11 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.graph
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import de.fra_uas.fb2.mobiledevices.visualizetilt.R
 
 class GraphFragment : Fragment() {
 

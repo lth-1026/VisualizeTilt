@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.tilt
 
 import android.content.Context
 import android.graphics.Canvas

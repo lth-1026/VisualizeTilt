@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.graph
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,6 +14,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import de.fra_uas.fb2.mobiledevices.visualizetilt.R
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyApplication
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyDataDao
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyDatabase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

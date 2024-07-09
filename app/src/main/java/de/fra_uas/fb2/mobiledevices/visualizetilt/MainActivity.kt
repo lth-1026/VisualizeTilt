@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import de.fra_uas.fb2.mobiledevices.visualizetilt.graph.GraphFragment
+import de.fra_uas.fb2.mobiledevices.visualizetilt.tilt.TiltFragment
 
 class MainActivity : AppCompatActivity() {
 

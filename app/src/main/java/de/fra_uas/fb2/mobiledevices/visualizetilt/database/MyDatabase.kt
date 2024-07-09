@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

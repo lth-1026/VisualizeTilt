@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.graph
 
 class Vec3(val x: Float, val y: Float, val z: Float) {
 

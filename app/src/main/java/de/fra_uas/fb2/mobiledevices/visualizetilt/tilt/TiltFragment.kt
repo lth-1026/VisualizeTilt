@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.tilt
 
 import android.annotation.SuppressLint
 import android.content.Context.SENSOR_SERVICE
@@ -14,6 +14,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import de.fra_uas.fb2.mobiledevices.visualizetilt.R
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyApplication
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyDataEntity
+import de.fra_uas.fb2.mobiledevices.visualizetilt.database.MyDatabase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

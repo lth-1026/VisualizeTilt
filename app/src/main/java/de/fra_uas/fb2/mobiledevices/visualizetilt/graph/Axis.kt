@@ -1,4 +1,4 @@
-package de.fra_uas.fb2.mobiledevices.visualizetilt
+package de.fra_uas.fb2.mobiledevices.visualizetilt.graph
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -67,7 +67,8 @@ class Axis {
     private val vertexStride = 6 * 4 // 4 bytes per vertex
 
     private val vertexShader = MyGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
-    private val fragmentShader = MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+    private val fragmentShader =
+        MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
     private val program = GLES20.glCreateProgram().also {
         GLES20.glAttachShader(it, vertexShader)
@@ -75,8 +76,10 @@ class Axis {
         GLES20.glLinkProgram(it)
     }
 
-    private val textureVertexShader = MyGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCodeForTexture)
-    private val textureFragmentShader = MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCodeForTexture)
+    private val textureVertexShader =
+        MyGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCodeForTexture)
+    private val textureFragmentShader =
+        MyGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCodeForTexture)
 
     private val textureProgram = GLES20.glCreateProgram().also {
         GLES20.glAttachShader(it, textureVertexShader)
